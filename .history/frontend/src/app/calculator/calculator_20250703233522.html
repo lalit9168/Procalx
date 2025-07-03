@@ -1,0 +1,1259 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .calculator {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .calculator-title {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2rem;
+            font-weight: 300;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .display {
+            background: linear-gradient(145deg, #2c3e50, #34495e);
+            border-radius: 15px;
+            padding: 25px 20px;
+            margin-bottom: 25px;
+            box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .display::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #3498db, #2ecc71, #f39c12, #e74c3c);
+            animation: rainbow 3s linear infinite;
+        }
+
+        @keyframes rainbow {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .expression {
+            color: #bdc3c7;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            min-height: 25px;
+            text-align: right;
+            opacity: 0.8;
+        }
+
+        .result {
+            color: #ecf0f1;
+            font-size: 2.5rem;
+            font-weight: 300;
+            text-align: right;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 15px;
+            padding: 20px;
+            font-size: 1.3rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s;
+        }
+
+        .btn:active::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-number {
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+            color: #2c3e50;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-operator {
+            background: linear-gradient(145deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        .btn-special {
+            background: linear-gradient(145deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .btn-equals {
+            background: linear-gradient(145deg, #2ecc71, #27ae60);
+            color: white;
+            grid-column: span 2;
+        }
+
+        .btn-zero {
+            grid-column: span 2;
+        }
+
+        .error {
+            color: #e74c3c;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .pulse {
+            animation: pulse 0.3s ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @media (max-width: 480px) {
+            .calculator {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .btn {
+                padding: 15px;
+                font-size: 1.1rem;
+            }
+            
+            .result {
+                font-size: 2rem;
+            }
+        }
+
+        /* New Styles */
+        .calculator-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .animated-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.7;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0); }
+        }
+
+        .calculator-card {
+            position: relative;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            z-index: 2;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+        }
+
+        .icon-container {
+            display: flex;
+            align-items: center;
+            margin-right: 15px;
+        }
+
+        .calculator-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(145deg, #3498db, #2980b9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+        }
+
+        .theme-toggle {
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .title {
+            font-size: 1.8rem;
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            font-weight: 300;
+            color: #777;
+        }
+
+        .calculator-body {
+            position: relative;
+            z-index: 2;
+        }
+
+        .display-section {
+            background: linear-gradient(145deg, #2c3e50, #34495e);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .display-primary {
+            font-size: 2.5rem;
+            font-weight: 300;
+            color: #ecf0f1;
+            text-align: right;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .display-secondary {
+            color: #bdc3c7;
+            font-size: 1.1rem;
+            margin-top: 5px;
+            text-align: right;
+            opacity: 0.8;
+        }
+
+        .calculator-form {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .inputs-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: #333;
+        }
+
+        .label-text {
+            display: flex;
+            align-items: center;
+        }
+
+        .label-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+            stroke: currentColor;
+        }
+
+        .label-badge {
+            background: #3498db;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-block;
+            line-height: 1;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .number-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2rem;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            color: #333;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .number-input:focus {
+            border-color: #3498db;
+        }
+
+        .input-glow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+            pointer-events: none;
+            box-shadow: 0 0 8px rgba(52, 152, 219, 0.6);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .input-wrapper:hover .input-glow {
+            opacity: 1;
+        }
+
+        .operation-group {
+            grid-column: span 2;
+        }
+
+        .operation-select {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2rem;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            color: #333;
+            outline: none;
+            appearance: none;
+            transition: border-color 0.3s;
+        }
+
+        .operation-select:focus {
+            border-color: #3498db;
+        }
+
+        .select-wrapper {
+            position: relative;
+        }
+
+        .select-arrow {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            width: 20px;
+            height: 20px;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 15px;
+            font-size: 1.2rem;
+            font-weight: 500;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-btn.secondary {
+            background: rgba(255, 255, 255, 0.8);
+            color: #333;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .action-btn.primary {
+            background: linear-gradient(145deg, #2ecc71, #27ae60);
+            color: white;
+        }
+
+        .action-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+            stroke: currentColor;
+        }
+
+        .loading-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading-spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.6);
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin-right: 5px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .result-section {
+            margin-top: 20px;
+        }
+
+        .result-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .result-icon-wrapper {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(145deg, #2ecc71, #27ae60);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+        }
+
+        .result-icon {
+            width: 20px;
+            height: 20px;
+            stroke: currentColor;
+        }
+
+        .result-info {
+            flex: 1;
+        }
+
+        .result-title {
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .result-subtitle {
+            font-size: 0.9rem;
+            font-weight: 300;
+            color: #777;
+        }
+
+        .result-value-container {
+            background: linear-gradient(145deg, #2c3e50, #34495e);
+            border-radius: 10px;
+            padding: 10px;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .result-value {
+            font-size: 2rem;
+            font-weight: 300;
+            color: #ecf0f1;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .copy-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .copy-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .history-section {
+            margin-top: 30px;
+        }
+
+        .history-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .history-title {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #333;
+            display: flex;
+            align-items: center;
+        }
+
+        .history-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 8px;
+            stroke: currentColor;
+        }
+
+        .clear-history-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .clear-history-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .history-list {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .history-item:hover {
+            background: rgba(52, 152, 219, 0.1);
+        }
+
+        .history-content {
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-expression {
+            font-size: 1rem;
+            font-weight: 400;
+            color: #333;
+        }
+
+        .history-result {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #2ecc71;
+        }
+
+        .history-time {
+            font-size: 0.9rem;
+            font-weight: 300;
+            color: #777;
+            white-space: nowrap;
+        }
+
+        .operation-info {
+            margin-top: 30px;
+            padding: 15px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .info-header {
+            display: flex;
+            align-items: center;
+        }
+
+        .info-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(145deg, #3498db, #2980b9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+        }
+
+        .info-content {
+            flex: 1;
+        }
+
+        .info-title {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .info-description {
+            font-size: 0.9rem;
+            font-weight: 300;
+            color: #777;
+        }
+
+        .info-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .stat {
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            font-weight: 300;
+            color: #777;
+        }
+
+        .stat-value {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator-container">
+      <!-- Animated Background -->
+      <div class="animated-background">
+        <div class="particle" *ngFor="let particle of particles" 
+             [style.left.px]="particle.x"
+             [style.top.px]="particle.y"
+             [style.animation-delay.s]="particle.delay">
+        </div>
+      </div>
+
+      <!-- Main Calculator Card -->
+      <div class="calculator-card">
+        <!-- Header Section -->
+        <div class="header">
+          <div class="header-content">
+            <div class="icon-container">
+              <div class="calculator-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="9" y1="9" x2="15" y2="15"></line>
+                  <line x1="15" y1="9" x2="9" y2="15"></line>
+                </svg>
+              </div>
+              <div class="theme-toggle" (click)="toggleTheme()">
+                <span class="theme-icon">{{ isDarkMode ? '☀️' : '🌙' }}</span>
+              </div>
+            </div>
+            <h1 class="title">Advanced Calculator</h1>
+            <p class="subtitle">Professional mathematical computations</p>
+          </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="calculator-body">
+          <!-- Display Section -->
+          <div class="display-section">
+            <div class="display-primary">
+              <span class="display-value">{{ displayValue }}</span>
+            </div>
+            <div class="display-secondary" *ngIf="lastCalculation">
+              <span class="last-calc">{{ lastCalculation }}</span>
+            </div>
+          </div>
+
+          <!-- Input Form -->
+          <form (submit)="calculate($event)" class="calculator-form">
+            <div class="inputs-grid">
+              <!-- First Number Input -->
+              <div class="input-group">
+                <label for="firstNumber" class="input-label">
+                  <span class="label-text">
+                    <svg class="label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3zM15 15h6v6h-6z"></path>
+                    </svg>
+                    First Number
+                  </span>
+                  <span class="label-badge">A</span>
+                </label>
+                <div class="input-wrapper">
+                  <input 
+                    id="firstNumber"
+                    type="number" 
+                    [(ngModel)]="a" 
+                    name="a" 
+                    placeholder="Enter first number" 
+                    required
+                    step="any"
+                    class="number-input"
+                    (input)="updateDisplay()"
+                    [class.error]="error && error.includes('first')"
+                  >
+                  <div class="input-glow"></div>
+                </div>
+              </div>
+
+              <!-- Operation Selection -->
+              <div class="operation-group">
+                <label for="operation" class="input-label">
+                  <span class="label-text">
+                    <svg class="label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="3"></circle>
+                      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                    Operation
+                  </span>
+                  <span class="label-badge">OP</span>
+                </label>
+                <div class="select-wrapper">
+                  <select 
+                    id="operation"
+                    [(ngModel)]="operation" 
+                    name="operation"
+                    class="operation-select"
+                    (change)="onOperationChange()"
+                  >
+                    <option value="add">➕ Addition</option>
+                    <option value="subtract">➖ Subtraction</option>
+                    <option value="multiply">✖️ Multiplication</option>
+                    <option value="divide">➗ Division</option>
+                    <option value="power">🔺 Power</option>
+                    <option value="factorial">❗ Factorial (A only)</option>
+                    <option value="sqrt">√ Square Root (A only)</option>
+                    <option value="modulus">% Modulus</option>
+                  </select>
+                  <div class="select-arrow">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="6,9 12,15 18,9"></polyline>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Second Number Input -->
+              <div class="input-group" [class.disabled]="isSingleArgOperation()">
+                <label for="secondNumber" class="input-label">
+                  <span class="label-text">
+                    <svg class="label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3zM15 15h6v6h-6z"></path>
+                    </svg>
+                    Second Number
+                  </span>
+                  <span class="label-badge" [class.optional]="isSingleArgOperation()">
+                    {{ isSingleArgOperation() ? 'N/A' : 'B' }}
+                  </span>
+                </label>
+                <div class="input-wrapper">
+                  <input 
+                    id="secondNumber"
+                    type="number" 
+                    [(ngModel)]="b" 
+                    name="b" 
+                    placeholder="Enter second number" 
+                    step="any"
+                    class="number-input"
+                    (input)="updateDisplay()"
+                    [disabled]="isSingleArgOperation()"
+                    [class.error]="error && error.includes('second')"
+                  >
+                  <div class="input-glow"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+              <button 
+                type="button" 
+                class="action-btn secondary"
+                (click)="clearAll()"
+                [disabled]="isLoading"
+              >
+                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M3 6h18"></path>
+                  <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                  <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                </svg>
+                <span>Clear</span>
+              </button>
+
+              <button 
+                type="submit" 
+                class="action-btn primary"
+                [disabled]="isLoading"
+                [class.loading]="isLoading"
+              >
+                <span *ngIf="!isLoading" class="btn-content">
+                  <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="13,2 3,14 12,14 11,22 21,10 12,10"></polygon>
+                  </svg>
+                  <span>Calculate</span>
+                </span>
+                <span *ngIf="isLoading" class="loading-content">
+                  <div class="loading-spinner"></div>
+                  <span>Computing...</span>
+                </span>
+              </button>
+            </div>
+          </form>
+
+          <!-- Result Section -->
+          <div class="result-section" *ngIf="result !== null || error">
+            <div *ngIf="result !== null && !error" class="result-card success">
+              <div class="result-header">
+                <div class="result-icon-wrapper">
+                  <svg class="result-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22,4 12,14.01 9,11.01"></polyline>
+                  </svg>
+                </div>
+                <div class="result-info">
+                  <h3 class="result-title">Result</h3>
+                  <p class="result-subtitle">{{ getCalculationString() }}</p>
+                </div>
+              </div>
+              <div class="result-value-container">
+                <div class="result-value">{{ formatResult(result) }}</div>
+              </div>
+              <button class="copy-btn" (click)="copyResult()" title="Copy result">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+              </button>
+            </div>
+
+            <div *ngIf="error" class="result-card error">
+              <div class="result-header">
+                <div class="result-icon-wrapper">
+                  <svg class="result-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                    <line x1="9" y1="9" x2="15" y2="15"></line>
+                  </svg>
+                </div>
+                <div class="result-info">
+                  <h3 class="result-title">Error</h3>
+                  <p class="result-subtitle">Something went wrong</p>
+                </div>
+              </div>
+              <div class="error-message">{{ error }}</div>
+            </div>
+          </div>
+
+          <!-- History Section -->
+          <div class="history-section" *ngIf="history.length > 0">
+            <div class="history-header">
+              <h3 class="history-title">
+                <svg class="history-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12,6 12,12 16,14"></polyline>
+                </svg>
+                Recent Calculations
+              </h3>
+              <button class="clear-history-btn" (click)="clearHistory()" title="Clear history">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3,6 5,6 21,6"></polyline>
+                  <path d="M19,6v14a2,2 0 0,1-2,2H7a2,2 0 0,1-2-2V6M8,6V4a2,2 0 0,1 2-2h4a2,2 0 0,1 2,2v2"></path>
+                </svg>
+              </button>
+            </div>
+            <div class="history-list">
+              <div class="history-item" *ngFor="let item of history.slice(-5)" (click)="useHistoryItem(item)">
+                <div class="history-content">
+                  <div class="history-expression">{{ item.expression }}</div>
+                  <div class="history-result">{{ formatResult(item.result) }}</div>
+                </div>
+                <div class="history-time">{{ formatTime(item.timestamp) }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Operation Info -->
+          <div class="operation-info">
+            <div class="info-card">
+              <div class="info-header">
+                <div class="info-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M9,9h6v6H9z"></path>
+                  </svg>
+                </div>
+                <div class="info-content">
+                  <h4 class="info-title">{{ getOperationName() }}</h4>
+                  <p class="info-description">{{ getOperationDescription() }}</p>
+                </div>
+              </div>
+              <div class="info-stats">
+                <div class="stat">
+                  <span class="stat-label">Calculations Today</span>
+                  <span class="stat-value">{{ history.length }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+        let currentExpression = '';
+        let currentResult = '0';
+        let lastOperator = '';
+        let justCalculated = false;
+
+        const expressionDisplay = document.getElementById('expression');
+        const resultDisplay = document.getElementById('result');
+
+        function updateDisplay() {
+            expressionDisplay.textContent = currentExpression;
+            resultDisplay.textContent = currentResult;
+        }
+
+        function addNumber(num) {
+            if (justCalculated) {
+                currentExpression = '';
+                justCalculated = false;
+            }
+            
+            if (currentResult === '0' || currentResult === 'Error') {
+                currentResult = num;
+            } else {
+                currentResult += num;
+            }
+            
+            currentExpression = currentExpression.replace(/[0-9.]+$/, '') + currentResult;
+            updateDisplay();
+            animateButton(event.target);
+        }
+
+        function addDecimal() {
+            if (justCalculated) {
+                currentExpression = '';
+                currentResult = '0';
+                justCalculated = false;
+            }
+            
+            if (!currentResult.includes('.')) {
+                if (currentResult === '0' || currentResult === 'Error') {
+                    currentResult = '0.';
+                } else {
+                    currentResult += '.';
+                }
+                currentExpression = currentExpression.replace(/[0-9.]+$/, '') + currentResult;
+                updateDisplay();
+            }
+            animateButton(event.target);
+        }
+
+        function addOperator(op) {
+            if (justCalculated) {
+                justCalculated = false;
+            }
+            
+            if (currentExpression && !isNaN(currentExpression.slice(-1))) {
+                calculate(false);
+            }
+            
+            currentExpression += ` ${op} `;
+            currentResult = '0';
+            lastOperator = op;
+            updateDisplay();
+            animateButton(event.target);
+        }
+
+        function addFunction(func) {
+            if (justCalculated) {
+                justCalculated = false;
+            }
+            
+            const num = parseFloat(currentResult);
+            let result;
+            
+            try {
+                switch(func) {
+                    case '√':
+                        if (num < 0) throw new Error('Invalid input');
+                        result = Math.sqrt(num);
+                        break;
+                    case '!':
+                        if (num < 0 || !Number.isInteger(num)) throw new Error('Invalid input');
+                        result = factorial(num);
+                        break;
+                    default:
+                        throw new Error('Unknown function');
+                }
+                
+                currentResult = result.toString();
+                currentExpression = `${func}(${num}) = ${result}`;
+                justCalculated = true;
+                
+            } catch (error) {
+                currentResult = 'Error';
+                showError();
+            }
+            
+            updateDisplay();
+            animateButton(event.target);
+        }
+
+        function calculate(showResult = true) {
+            if (!currentExpression) return;
+            
+            try {
+                // Replace display symbols with JavaScript operators
+                let expression = currentExpression
+                    .replace(/×/g, '*')
+                    .replace(/÷/g, '/')
+                    .replace(/−/g, '-')
+                    .replace(/\^/g, '**');
+                
+                // Handle percentage
+                expression = expression.replace(/(\d+(?:\.\d+)?)\s*%/g, '($1/100)');
+                
+                const result = eval(expression);
+                
+                if (!isFinite(result)) {
+                    throw new Error('Invalid calculation');
+                }
+                
+                currentResult = parseFloat(result.toFixed(10)).toString();
+                
+                if (showResult) {
+                    currentExpression += ` = ${currentResult}`;
+                    justCalculated = true;
+                }
+                
+            } catch (error) {
+                currentResult = 'Error';
+                showError();
+            }
+            
+            updateDisplay();
+            if (event && event.target) {
+                animateButton(event.target);
+            }
+        }
+
+        function clearAll() {
+            currentExpression = '';
+            currentResult = '0';
+            lastOperator = '';
+            justCalculated = false;
+            updateDisplay();
+            animateButton(event.target);
+        }
+
+        function clearEntry() {
+            currentResult = '0';
+            updateDisplay();
+            animateButton(event.target);
+        }
+
+        function deleteLast() {
+            if (currentResult.length > 1) {
+                currentResult = currentResult.slice(0, -1);
+            } else {
+                currentResult = '0';
+            }
+            
+            // Update expression to match
+            if (currentExpression) {
+                currentExpression = currentExpression.replace(/[0-9.]+$/, currentResult);
+            }
+            
+            updateDisplay();
+            animateButton(event.target);
+        }
+
+        function factorial(n) {
+            if (n === 0 || n === 1) return 1;
+            if (n > 170) throw new Error('Number too large');
+            let result = 1;
+            for (let i = 2; i <= n; i++) {
+                result *= i;
+            }
+            return result;
+        }
+
+        function showError() {
+            resultDisplay.classList.add('error');
+            setTimeout(() => {
+                resultDisplay.classList.remove('error');
+            }, 500);
+        }
+
+        function animateButton(button) {
+            button.classList.add('pulse');
+            setTimeout(() => {
+                button.classList.remove('pulse');
+            }, 300);
+        }
+
+        // Keyboard support
+        document.addEventListener('keydown', function(event) {
+            const key = event.key;
+            
+            if (key >= '0' && key <= '9') {
+                addNumber(key);
+            } else if (key === '.') {
+                addDecimal();
+            } else if (key === '+') {
+                addOperator('+');
+            } else if (key === '-') {
+                addOperator('−');
+            } else if (key === '*') {
+                addOperator('×');
+            } else if (key === '/') {
+                event.preventDefault();
+                addOperator('÷');
+            } else if (key === 'Enter' || key === '=') {
+                event.preventDefault();
+                calculate();
+            } else if (key === 'Escape' || key === 'c' || key === 'C') {
+                clearAll();
+            } else if (key === 'Backspace') {
+                deleteLast();
+            }
+        });
+
+        // Initialize display
+        updateDisplay();
+    </script>
+</body>
+</html> -->

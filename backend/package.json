@@ -1,0 +1,25 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "lalit-advanced-calculator": "^1.0.0",
+    "lalit-advanced-calculator-java": "^1.0.3",
+    "lalit-calculator-update": "^1.0.0",
+    "lalit-calculator-update-new": "^1.0.1",
+    "lalit-calculator-update-new1": "^1.0.1",
+    "lalit-calculator-update-new2": "^1.0.2",
+    "lalit-java-calculator-new": "^1.0.0",
+    "mongoose": "^8.16.1"
+  }
+}

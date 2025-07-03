@@ -1,0 +1,14 @@
+<!-- ...existing code from your Angular calculator template (the content of the template: `...` property in your calculator.ts file)... -->
+<!-- Example: -->
+<div class="calculator-container">
+  <!-- Animated Background -->
+  <div class="animated-background">
+    <div class="particle" *ngFor="let particle of particles" 
+         [style.left.px]="particle.x"
+         [style.top.px]="particle.y"
+         [style.animation-delay.s]="particle.delay">
+    </div>
+  </div>
+  <!-- ...existing code... -->
+</div>
+<!-- ...existing code... -->
